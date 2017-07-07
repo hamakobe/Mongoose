@@ -28,6 +28,12 @@ mins=0
 secs=0
 tenths=0
 
+#Setting up multilevel dictionaries
+session = {}
+session[mins]={}
+session[mins][secs]={}
+session[mins][secs][tenths]={}
+
 #Output file name and directory definition
 sessionstarttime = datetime.datetime.now().strftime(' %b, %d, %Y %H %M %S')
 targetdir = os.path.dirname(__file__)+'/Logs/'
@@ -35,7 +41,7 @@ targetname = "{d}Session from {t}.json".format(d=targetdir,t=sessionstarttime)
 logname = "{d}Session from {t}.txt".format(d=targetdir,t=sessionstarttime)
 targetfile = open(targetname,"w")
 logfile = open(logname,"w")
-session = {}
+
 
 #Main Assetto Corsa function, builds the App Window and the labels associated with it
 def acMain(ac_version):
@@ -62,10 +68,12 @@ def acUpdate(deltaT):
     
     tenths += 1
     if tenths > 9:
-        secs += 1 
+        secs += 1
+        session[mins][secs]={}
         tenths = 0
     if secs > 59:
         mins += 1
+        session[mins]={}
         secs = 0
         
     laps = ac.getCarState(0, acsys.CS.LapCount)
@@ -75,14 +83,12 @@ def acUpdate(deltaT):
     #targetfile.write("{c} {s} MPH \n".format(c=currenttime,s=round(speed,2)))
     
     #Setting up multilevel dictionaries
-    session[mins]={}
-    session[mins][secs]={}
     session[mins][secs][tenths]={}
     
     # Data Logging
     session[mins][secs][tenths]['speed'] = "{} MPH".format(speed)
     #logfile.write("{m}:{s}.{t} - {sp}\n".format(m=mins,s=secs,t=tenths,sp=session[mins][secs][tenths]['speed']))
-    json.dump(session,targetfile, indent=4)
+    #json.dump(session,targetfile, indent=4) #wrong, because it dumps a new version and appends at every run, resulting in large files
     
     #For Updating "Laps" Label
     if laps > lapcount:
@@ -112,4 +118,4 @@ class ticker:
         
 def acShutdown():
     global targetfile, session, logfile
-    #json.dump(session,targetfile, indent=4) #dumps entire session dictionary into a local JSON file
+    json.dump(session,targetfile, indent=4) #dumps entire session dictionary into a local JSON file
