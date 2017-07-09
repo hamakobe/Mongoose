@@ -1,0 +1,4 @@
+1. Ensure that Python 3.6 is installed on the current machine.
+2. Ensure that windows environment variables are setup appropriately such that python can be run on CMD
+3. Run: python -m pip install pymongo
+4. Run: python -m pip install pymongo[tls]
