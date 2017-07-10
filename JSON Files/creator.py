@@ -26,7 +26,7 @@ for mins in range(60):
 #sessionjson = json.dumps(session)
 #print(sessionjson)
 with open(targetname, 'w') as fp:
-    json.dump(session, fp, indent = 4)
+    json.dump(session, fp)
 
 fileinfo = os.stat(targetname)
 filesizeMB = round(fileinfo.st_size*1e-6,2)
