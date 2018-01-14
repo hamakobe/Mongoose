@@ -23,6 +23,17 @@ l_lapcount=0
 lapcount=0
 l_speed=0
 tick=0
+laps=0
+speed = 0
+clap_top_speed = 0
+llap_top_speed = 0
+tspeed_session = 0
+appWindow = ac.newApp("Mongoose")
+l_lapcount = ac.addLabel(appWindow, "Laps: {}".format(0));
+l_speed = ac.addLabel(appWindow, "Speed: {}".format(0));
+l_tspeed_session = ac.addLabel(appWindow, "Session Top Speed: {}".format(0));
+l_tspeed_llap = ac.addLabel(appWindow, "Last Lap Top Speed: {}".format(0));
+l_tspeed_clap = ac.addLabel(appWindow, "Current Lap Top Speed: {}".format(0));
 
 #Output file name and directory definition
 sessionstarttime = datetime.datetime.now().strftime(' %b, %d, %Y %H %M %S')
@@ -30,36 +41,46 @@ targetdir = os.path.dirname(__file__)+'/Logs/'
 targetname = "{d}Session from {t}.txt".format(d=targetdir,t=sessionstarttime)
 targetfile = open(targetname,"w")
 
+
 #Main Assetto Corsa function, builds the App Window and the labels associated with it
 def acMain(ac_version):
-    global l_lapcount, targetdir, path, tick
+    global l_lapcount, l_speed, appWindow, l_tspeed_session, l_tspeed_llap, l_tspeed_clap, tick
     
     tick=ticker() #set the global variable to be a ticker, see the class below
-    
-    appWindow = ac.newApp("Mongoose") 
     ac.setSize(appWindow, 250, 200)
-    
-    l_lapcount = ac.addLabel(appWindow, "Laps: {}".format(0));
+
     ac.setPosition(l_lapcount, 3, 30)
-    
+    ac.setPosition(l_speed, 3, 60)
+    ac.setPosition(l_tspeed_session, 3, 80)
+    ac.setPosition(l_tspeed_llap, 3, 100)
+    ac.setPosition(l_tspeed_clap, 3, 120)
     return "Mongoose"
     
 #Main update function for Assetto Corsa, it runs the enclosed code every DeltaT - I think DeltaT = 1/60 of a second
 def acUpdate(deltaT):
-    global l_lapcount, l_speed, lapcount, targetfile, tick
+    global l_lapcount, l_speed, lapcount, targetfile, tick, speed, clap_top_speed, llap_top_speed, tspeed_session
 
-    if tick.tack(deltaT):  #does not bother CPU with unnecessary updates, basically exists the update function call if time is less than value specified in ticker()
+    if tick.tack(deltaT):  #does not bother CPU with unnecessary updates, basically exits the update function call if time is less than value specified in ticker()
         return
-     
-    laps = ac.getCarState(0, acsys.CS.LapCount)
-    speed = ac.getCarState(0, acsys.CS.SpeedMPH)
-    currenttime = datetime.datetime.now().strftime('%H:%M:%S.%f')[:-4] #gets the current system clock down to the hundredth of a second (if [-4])
     
-    targetfile.write("{c} {s} MPH \n".format(c=currenttime,s=round(speed,2)))
-           
+    laps = ac.getCarState(0, acsys.CS.LapCount)
+    speed = round(ac.getCarState(0, acsys.CS.SpeedMPH),2)
+    ac.setText(l_speed,"Speed: {} MPH".format(speed))
+    
+    if speed > clap_top_speed:
+        clap_top_speed = speed
+        ac.setText(l_tspeed_clap,"Current Lap Top Speed: {} MPH".format(clap_top_speed))
+
+    if speed > tspeed_session:
+        tspeed_session = speed
+        ac.setText(l_tspeed_session,"Session Top Speed: {} MPH".format(tspeed_session))
+
     if laps > lapcount:
         lapcount = laps
+        llap_top_speed = clap_top_speed
+        clap_top_speed = 0
         ac.setText(l_lapcount, "Laps: {}".format(lapcount)) #updates the label in the App Window defined on acMain
+        ac.setText(l_tspeed_llap, "Last Lap Top Speed: {} MPH".format(llap_top_speed));
         
 #-----------------------
 # ticker function, to determine update rate
