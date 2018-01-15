@@ -35,7 +35,6 @@ l_tspeed_session = ac.addLabel(appWindow, "Session Top Speed: {}".format(0));
 l_tspeed_llap = ac.addLabel(appWindow, "Last Lap Top Speed: {}".format(0));
 l_tspeed_clap = ac.addLabel(appWindow, "Current Lap Top Speed: {}".format(0));
 
-
 #Output file name and directory definition
 sessionstarttime = datetime.datetime.now().strftime(' %b, %d, %Y %H %M %S')
 targetdir = os.path.dirname(__file__)+'/Logs/'
@@ -49,13 +48,13 @@ def acMain(ac_version):
     
     tick=ticker() #set the global variable to be a ticker, see the class below
     ac.setSize(appWindow, 250, 200)
+
     ac.setPosition(l_lapcount, 3, 30)
     ac.setPosition(l_speed, 3, 60)
     ac.setPosition(l_tspeed_session, 3, 80)
     ac.setPosition(l_tspeed_llap, 3, 100)
     ac.setPosition(l_tspeed_clap, 3, 120)
-
-    return "Kabal"
+    return "Mongoose"
     
 #Main update function for Assetto Corsa, it runs the enclosed code every DeltaT - I think DeltaT = 1/60 of a second
 def acUpdate(deltaT):
